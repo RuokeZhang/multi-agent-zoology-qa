@@ -1,0 +1,58 @@
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Zoology QA Multi-Agent</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; }
+      #chat { border: 1px solid #ccc; padding: 1rem; height: 400px; overflow-y: auto; }
+      .msg { margin-bottom: 1rem; }
+      .user { font-weight: bold; }
+      .agent { color: #2a7; }
+      pre { background: #f7f7f7; padding: 0.5rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Zoology Multi-Agent QA</h1>
+    <div id="chat"></div>
+    <form id="ask-form">
+      <input type="text" id="question" placeholder="Ask a zoology question..." size="60" required />
+      <input type="text" id="image_url" placeholder="Optional image URL" size="30" />
+      <select id="age_level">
+        <option value="">Age level</option>
+        <option value="child">Child</option>
+        <option value="high-school">High School</option>
+        <option value="undergraduate">Undergraduate</option>
+      </select>
+      <button type="submit">Ask</button>
+    </form>
+    <script>
+      const chat = document.getElementById('chat');
+      const form = document.getElementById('ask-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const question = document.getElementById('question').value;
+        const image_url = document.getElementById('image_url').value;
+        const age_level = document.getElementById('age_level').value;
+        appendMessage('user', question);
+        const res = await fetch('/api/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, image_url, age_level, session_id: 'demo' })
+        });
+        const data = await res.json();
+        appendMessage('agent', JSON.stringify(data, null, 2));
+        form.reset();
+      });
+      function appendMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = 'msg ' + role;
+        div.innerHTML = `<span class="${role === 'user' ? 'user' : 'agent'}">${role}:</span> <pre>${text}</pre>`;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
+```
